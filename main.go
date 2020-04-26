@@ -4,7 +4,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -22,7 +24,7 @@ func main() {
 	r.Handle("/products/{slug}/feedback", AddFeedbackHandler).Methods("POST")
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":3020", handlers.LoggingHandler(os.Stdout, r))
 }
 
 // Here we are implementing the NotImplemented handler. Whenever an API endpoint is hit
