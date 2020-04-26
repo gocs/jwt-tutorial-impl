@@ -16,4 +16,4 @@
 
 # Hide dem secrets
 .env
-static/js/auth0-variable.js
+static/js/auth0-variables.js

@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -13,10 +14,15 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("failed to load .env; here's why: ", err)
+	}
+
 	// Here we are instantiating the gorilla/mux router
 	r := mux.NewRouter()
 
