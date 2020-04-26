@@ -118,9 +118,20 @@ var LoggedIn = React.createClass({
 });
 
 var Product = React.createClass({
+    // The upvote and downvote functions will send an API request to the backend
+    // These calls too will send the access_token and be verified before a success response
+    // is returned
     upvote: function () {
+        var product = this.props.product;
+        this.serverRequest = $.post(AUTH0_CALLBACK_URL + '/products/' + product.Slug + '/feedback', { vote: 1 }, function (result) {
+            this.setState({ voted: "Upvoted" })
+        }.bind(this));
     },
     downvote: function () {
+        var product = this.props.product;
+        this.serverRequest = $.post(AUTH0_CALLBACK_URL + '/products/' + product.Slug + '/feedback', { vote: -1 }, function (result) {
+            this.setState({ voted: "Downvoted" })
+        }.bind(this));
     },
     getInitialState: function () {
         return {
