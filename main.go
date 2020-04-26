@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -22,6 +24,8 @@ func main() {
 	r.Handle("/status", StatusHandler).Methods("GET")
 	r.Handle("/products", ProductsHandler).Methods("GET")
 	r.Handle("/products/{slug}/feedback", AddFeedbackHandler).Methods("POST")
+
+	r.Handle("/get-token", GetTokenHandler).Methods("GET")
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
 	http.ListenAndServe(":3020", handlers.LoggingHandler(os.Stdout, r))
@@ -90,4 +94,27 @@ var AddFeedbackHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Re
 	} else {
 		w.Write([]byte("Product Not Found"))
 	}
+})
+
+/* Set up a global string for our secret */
+var mySigningKey = []byte("secret")
+
+/* Handlers */
+var GetTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	/* Create the token */
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	/* Create a map to store our claims */
+	claims := token.Claims.(jwt.MapClaims)
+
+	/* Set token claims */
+	claims["admin"] = true
+	claims["name"] = "Ado Kukic"
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+
+	/* Sign the token with our secret */
+	tokenString, _ := token.SignedString(mySigningKey)
+
+	/* Finally, write the token to the browser window */
+	w.Write([]byte(tokenString))
 })
