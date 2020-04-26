@@ -76,3 +76,5 @@ var Product = React.createClass({
             </div>);
     }
 });
+
+ReactDOM.render(<App />, document.getElementById('app'));
