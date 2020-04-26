@@ -3,14 +3,17 @@ package main
 // Import our dependencies. We'll use the standard HTTP library as well as the gorilla router for this app
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/auth0-community/go-auth0"
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 func main() {
@@ -24,13 +27,35 @@ func main() {
 
 	r.Handle("/status", StatusHandler).Methods("GET")
 	/* We will add the middleware to our products and feedback routes. The status route will be publicly accessible */
-	r.Handle("/products", jwtMiddleware.Handler(ProductsHandler)).Methods("GET")
-	r.Handle("/products/{slug}/feedback", jwtMiddleware.Handler(AddFeedbackHandler)).Methods("POST")
-
-	r.Handle("/get-token", GetTokenHandler).Methods("GET")
+	r.Handle("/products", authMiddleware(ProductsHandler)).Methods("GET")
+	r.Handle("/products/{slug}/feedback", authMiddleware(AddFeedbackHandler)).Methods("POST")
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
 	http.ListenAndServe(":3020", handlers.LoggingHandler(os.Stdout, r))
+}
+
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		secretProvider := auth0.NewKeyProvider([]byte(os.Getenv("AUTH0SECRET")))
+		configuration := auth0.NewConfiguration(
+			secretProvider,
+			[]string{os.Getenv("AUTH0AUDIENCE")},
+			os.Getenv("AUTH0DOMAIN"),
+			jose.HS256,
+		)
+		validator := auth0.NewValidator(configuration, nil)
+
+		token, err := validator.ValidateRequest(r)
+
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Token is not valid:", token)
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Unauthorized"))
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
 }
 
 // Here we are implementing the NotImplemented handler. Whenever an API endpoint is hit
