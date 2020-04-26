@@ -81,10 +81,25 @@ var Home = React.createClass({
 });
 
 var LoggedIn = React.createClass({
+    // If a user logs out we will remove their tokens and profile info
+    logout: function () {
+        localStorage.removeItem('id_token');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('profile');
+        location.reload();
+    },
     getInitialState: function () {
         return {
             products: []
         }
+    },
+    // Once this components mounts, we will make a call to the API to get the product data
+    componentDidMount: function () {
+        this.serverRequest = $.get(AUTH0_CALLBACK_URL + '/products', function (result) {
+            this.setState({
+                products: result,
+            });
+        }.bind(this));
     },
     render: function () {
         return (
