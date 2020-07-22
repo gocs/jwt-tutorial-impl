@@ -8,7 +8,11 @@ https://auth0.com/blog/authentication-in-golang/
 
 ## run
 
-AUTH0SECRET="" AUTH0AUDIENCE="" AUTH0DOMAIN="" go run .
+```
+$ AUTH0SECRET="" AUTH0AUDIENCE="" AUTH0DOMAIN="" go run .
+```
+
+fill the empty string above based on the values below.
 
 **AUTH0SECRET**
 
@@ -21,8 +25,6 @@ also called as *AUTH0_API_AUDIENCE*
 ![if there's an error in the domain](./assets/audience-location.png)
 
 **AUTH0_CALLBACK_URL**
-
-also called as *AUTH0_CALLBACK_URL*
 
 ![Route with login](./assets/localhost-callback-url.png)
 
