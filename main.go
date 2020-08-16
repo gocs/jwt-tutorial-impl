@@ -59,7 +59,7 @@ func authMiddleware(next http.Handler) http.Handler {
 		fmt.Println(err)
 		fmt.Println("Token is not valid:", token)
 		w.WriteHeader(http.StatusUnauthorized)
-		if err = w.Write([]byte("Unauthorized")); err != nil {
+		if err := w.Write([]byte("Unauthorized")); err != nil {
 			log.Println("error writing status:", err)
 		}
 	})
@@ -87,7 +87,7 @@ var products = []Product{
 /* The status handler will be invoked when the user calls the /status route
    It will simply return a string with the message "API is up and running" */
 var StatusHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	if err = w.Write([]byte("API is up and running")); err != nil {
+	if err := w.Write([]byte("API is up and running")); err != nil {
 		log.Println("error writing status:", err)
 	}
 })
@@ -100,7 +100,7 @@ var ProductsHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(payload))
-	if err = w.Write([]byte(payload)); err != nil {
+	if err := w.Write([]byte(payload)); err != nil {
 		log.Println("error writing payload:", err)
 	}
 })
