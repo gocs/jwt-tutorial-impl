@@ -35,7 +35,7 @@ func main() {
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
 	if err := http.ListenAndServe(":3020", handlers.LoggingHandler(os.Stdout, r)); err != nil {
-		log.Println("error:", err)
+		log.Println("error upon serving:", err)
 	}
 }
 
@@ -52,13 +52,15 @@ func authMiddleware(next http.Handler) http.Handler {
 
 		token, err := validator.ValidateRequest(r)
 
-		if err != nil {
-			fmt.Println(err)
-			fmt.Println("Token is not valid:", token)
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized"))
-		} else {
+		if err == nil {
 			next.ServeHTTP(w, r)
+			return
+		}
+		fmt.Println(err)
+		fmt.Println("Token is not valid:", token)
+		w.WriteHeader(http.StatusUnauthorized)
+		if err = w.Write([]byte("Unauthorized")); err != nil {
+			log.Println("error writing status:", err)
 		}
 	})
 }
@@ -85,7 +87,9 @@ var products = []Product{
 /* The status handler will be invoked when the user calls the /status route
    It will simply return a string with the message "API is up and running" */
 var StatusHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("API is up and running"))
+	if err = w.Write([]byte("API is up and running")); err != nil {
+		log.Println("error writing status:", err)
+	}
 })
 
 /* The products handler will be called when the user makes a GET request to the /products endpoint.
@@ -96,6 +100,9 @@ var ProductsHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(payload))
+	if err = w.Write([]byte(payload)); err != nil {
+		log.Println("error writing payload:", err)
+	}
 })
 
 /* The feedback handler will add either positive or negative feedback to the product
