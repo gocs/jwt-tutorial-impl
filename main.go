@@ -34,7 +34,9 @@ func main() {
 	r.Handle("/products/{slug}/feedback", authMiddleware(AddFeedbackHandler)).Methods("POST")
 
 	// Our application will run on port 3000. Here we declare the port and pass in our router.
-	http.ListenAndServe(":3020", handlers.LoggingHandler(os.Stdout, r))
+	if err := http.ListenAndServe(":3020", handlers.LoggingHandler(os.Stdout, r)); err != nil {
+		log.Println("error:", err)
+	}
 }
 
 func authMiddleware(next http.Handler) http.Handler {
