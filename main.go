@@ -95,7 +95,6 @@ var ProductsHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Reque
 	payload, _ := json.Marshal(products)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(payload))
 	if _, err := w.Write([]byte(payload)); err != nil {
 		log.Println("error writing payload:", err)
 	}
